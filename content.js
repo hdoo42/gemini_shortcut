@@ -289,7 +289,7 @@ document.addEventListener("keydown", async function (event) {
         actionTaken = await openMenuAndClickItem(
           modelMenuTriggerSelectors,
           "Flash Model",
-          "1.5 Flash", // Ensure this text exactly matches the menu item
+          "2.5 Flash", // Ensure this text exactly matches the menu item
         );
         break;
 
@@ -299,7 +299,7 @@ document.addEventListener("keydown", async function (event) {
         actionTaken = await openMenuAndClickItem(
           modelMenuTriggerSelectors,
           "Pro Model",
-          "1.5 Pro", // Ensure this text exactly matches the menu item
+          "2.5 Pro", // Ensure this text exactly matches the menu item
         );
         break;
 
