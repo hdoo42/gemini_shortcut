@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Gemini 단축키",
+  "version": "1.0",
+  "description": "gemini.google.com 사이트의 주요 기능에 대한 단축키를 추가합니다.",
+  "icons": {
+    "16": "images/icon16.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://gemini.google.com/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
