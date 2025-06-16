@@ -1,9 +1,9 @@
 // content.js
-// Updated with more specific selectors and model selection logic.
+// Updated with more specific selectors, model selection logic, and help message.
 // Gemini site's UI element selectors can change. If a shortcut stops working,
 // use browser Developer Tools (F12 or Ctrl+Shift+I) to find the new selector.
 
-console.log("Gemini 단축키 확장 프로그램 로드됨 (v7)"); // Version updated
+console.log("Gemini Shortcut Extension Loaded (v1.0.1)");
 
 // Helper function to click an element (can be selector string or actual element)
 function clickElement(target, description) {
@@ -26,15 +26,15 @@ function clickElement(target, description) {
     }
     element.click();
     console.log(
-      `${description} 클릭됨 (Target: ${typeof target === "string" ? target : "DIRECT_ELEMENT"}).`,
+      `${description} clicked (Target: ${typeof target === "string" ? target : "DIRECT_ELEMENT"}).`,
     );
     return true;
   } else {
     console.error(
-      `${description}을(를) 찾을 수 없습니다. (Target: ${typeof target === "string" ? target : "DIRECT_ELEMENT"})`,
+      `Could not find ${description}. (Target: ${typeof target === "string" ? target : "DIRECT_ELEMENT"})`,
     );
     if (typeof target === "string") {
-      showTemporaryMessage(`${description} 요소를 찾을 수 없습니다.`);
+      showTemporaryMessage(`Could not find the ${description} element.`);
     }
     return false;
   }
@@ -45,11 +45,11 @@ function focusElement(selector, description) {
   const element = document.querySelector(selector);
   if (element) {
     element.focus();
-    console.log(`${description} 포커스됨:`, selector);
+    console.log(`${description} focused:`, selector);
     return true;
   } else {
-    console.error(`${description}을(를) 찾을 수 없습니다. 선택자: ${selector}`);
-    showTemporaryMessage(`${description} 요소를 찾을 수 없습니다.`);
+    console.error(`Could not find ${description}. Selector: ${selector}`);
+    showTemporaryMessage(`Could not find the ${description} element.`);
     return false;
   }
 }
@@ -77,7 +77,7 @@ async function openMenuAndClickItem(
     console.error(
       `Menu trigger button not found (tried: ${menuTriggerSelectors.join(", ")}) for ${menuItemDescription}.`,
     );
-    showTemporaryMessage(`모델 메뉴를 여는 버튼을 찾지 못했습니다.`);
+    showTemporaryMessage(`Could not find the button to open the model menu.`);
     return false;
   }
 
@@ -118,7 +118,7 @@ async function openMenuAndClickItem(
       const textElement = item.querySelector("span.gds-label-l.gds-label-m");
       if (
         textElement &&
-        textElement.textContent.trim().includes(menuItemTextToFind) 
+        textElement.textContent.trim().includes(menuItemTextToFind)
       ) {
         console.log(
           `Found matching menu item: "${textElement.textContent.trim()}" for "${menuItemTextToFind}".`,
@@ -128,7 +128,7 @@ async function openMenuAndClickItem(
           clickElement(item, `${menuItemDescription} ("${menuItemTextToFind}")`)
         ) {
           showTemporaryMessage(
-            `${menuItemDescription} 선택됨: ${menuItemTextToFind}`,
+            `${menuItemDescription} selected: ${menuItemTextToFind}`,
           );
           return true;
         } else {
@@ -160,11 +160,11 @@ async function openMenuAndClickItem(
   }
 
   // If menu is not open, or if it was open but item wasn't clicked, click the trigger.
-  const triggerDesc = `모델 메뉴 트리거 (${menuTriggerButton.tagName}${menuTriggerButton.getAttribute("data-test-id") ? `[data-test-id="${menuTriggerButton.getAttribute("data-test-id")}"]` : `.${menuTriggerButton.className.split(" ")[0]}`})`;
+  const triggerDesc = `Model Menu Trigger (${menuTriggerButton.tagName}${menuTriggerButton.getAttribute("data-test-id") ? `[data-test-id="${menuTriggerButton.getAttribute("data-test-id")}"]` : `.${menuTriggerButton.className.split(" ")[0]}`})`;
   console.log(`Attempting to click ${triggerDesc}.`);
-  if (!clickElement(menuTriggerButton, "모델 메뉴 트리거")) {
-    console.error("모델 메뉴 트리거를 클릭하지 못했습니다.");
-    showTemporaryMessage("모델 메뉴를 열지 못했습니다.");
+  if (!clickElement(menuTriggerButton, "Model Menu Trigger")) {
+    console.error("Failed to click the model menu trigger.");
+    showTemporaryMessage("Failed to open the model menu.");
     return false; // Stop if trigger can't be clicked
   }
 
@@ -182,10 +182,10 @@ async function openMenuAndClickItem(
             resolve(true);
           } else {
             console.error(
-              `${menuItemDescription} ("${menuItemTextToFind}")을(를) 메뉴에서 찾거나 클릭할 수 없습니다 (최종 시도 후).`,
+              `Could not find or click ${menuItemDescription} ("${menuItemTextToFind}") in the menu (after final attempt).`,
             );
             showTemporaryMessage(
-              `${menuItemDescription} (${menuItemTextToFind})을(를) 선택할 수 없습니다.`,
+              `Could not select ${menuItemDescription} (${menuItemTextToFind}).`,
             );
             resolve(false);
           }
@@ -221,80 +221,91 @@ document.addEventListener("keydown", async function (event) {
     ];
 
     switch (event.key.toLowerCase()) {
-      case "j": // 새 채팅 (New Chat)
+      case "j": // New Chat
         event.preventDefault();
-        console.log("Cmd/Ctrl + J 눌림: 새 채팅 시도");
-        actionTaken =
-          clickElement(
-            'side-nav-action-button[data-test-id="new-chat-button"] button[data-test-id="expanded-button"]',
-            "새 채팅 버튼",
-          ) ||
-          clickElement(
-            'button[aria-label="New chat"]',
-            "새 채팅 버튼 (대체)",
-          ) ||
-          clickElement(
-            'button[aria-label="새 채팅"]',
-            "새 채팅 버튼 (대체 한국어)",
-          );
-        break;
+        console.log("Cmd/Ctrl + J pressed: Attempting new chat");
+        const newChatSelector1 =
+          'side-nav-action-button[data-test-id="new-chat-button"] button[data-test-id="expanded-button"]';
+        const newChatSelector2 = 'button[aria-label="New chat"]';
+        const newChatSelector3 = 'button[aria-label="새 채팅"]'; // Keeping Korean as a fallback
 
-      case "d": // 사이드바 토글 (Sidebar Toggle)
-        event.preventDefault();
-        console.log("Cmd/Ctrl + D 눌림: 사이드바 토글 시도");
-        actionTaken =
-          clickElement(
-            'button[data-test-id="side-nav-menu-button"][aria-label="기본 메뉴"]',
-            "사이드바 토글 버튼 (기본 메뉴)",
-          ) ||
-          clickElement(
-            'button[data-test-id="side-nav-menu-button"]',
-            "사이드바 토글 버튼 (data-test-id)",
-          ) ||
-          clickElement(
-            'button[aria-label*="sidebar"], button[aria-label*="사이드바"]',
-            "사이드바 토글 버튼 (이전 대체)",
-          );
-        break;
-
-      case "k": // 검색 (Search)
-        event.preventDefault();
-        console.log("Cmd/Ctrl + K 눌림: 검색 시도");
-        actionTaken = clickElement(
-          'button.search-button[aria-label="검색"]',
-          "검색 버튼",
-        );
-        if (!actionTaken) {
-          actionTaken = focusElement(
-            'input[placeholder*="Search"], input[placeholder*="검색"], input[aria-label*="Search"], input[aria-label*="검색"]',
-            "검색 입력창",
+        if (document.querySelector(newChatSelector1)) {
+          actionTaken = clickElement(newChatSelector1, "New Chat Button");
+        } else if (document.querySelector(newChatSelector2)) {
+          actionTaken = clickElement(newChatSelector2, "New Chat Button (fallback)");
+        } else {
+          actionTaken = clickElement(
+            newChatSelector3,
+            "New Chat Button (Korean fallback)",
           );
         }
         break;
 
-      case "i": // Flash 모델 선택 (Select Flash Model)
+      case "d": // Sidebar Toggle
         event.preventDefault();
-        console.log("Cmd/Ctrl + I 눌림: Flash 모델 선택 시도");
+        console.log("Cmd/Ctrl + D pressed: Attempting to toggle sidebar");
+        const sidebarSelector1 =
+          'button[data-test-id="side-nav-menu-button"][aria-label="Main menu"]';
+        const sidebarSelector2 = 'button[data-test-id="side-nav-menu-button"]';
+        const sidebarSelector3 =
+          'button[aria-label*="sidebar"], button[aria-label*="사이드바"]'; // Keeping Korean as a fallback
+
+        if (document.querySelector(sidebarSelector1)) {
+          actionTaken = clickElement(
+            sidebarSelector1,
+            "Sidebar Toggle Button (Main menu)",
+          );
+        } else if (document.querySelector(sidebarSelector2)) {
+          actionTaken = clickElement(
+            sidebarSelector2,
+            "Sidebar Toggle Button (data-test-id)",
+          );
+        } else {
+          actionTaken = clickElement(
+            sidebarSelector3,
+            "Sidebar Toggle Button (previous fallback)",
+          );
+        }
+        break;
+
+      case "k": // Search
+        event.preventDefault();
+        console.log("Cmd/Ctrl + K pressed: Attempting search");
+        actionTaken = clickElement(
+          'button.search-button[aria-label="Search"], button.search-button[aria-label="검색"]',
+          "Search Button",
+        );
+        if (!actionTaken) {
+          actionTaken = focusElement(
+            'input[placeholder*="Search"], input[placeholder*="검색"], input[aria-label*="Search"], input[aria-label*="검색"]',
+            "Search Input",
+          );
+        }
+        break;
+
+      case "i": // Select Flash Model
+        event.preventDefault();
+        console.log("Cmd/Ctrl + I pressed: Attempting to select Flash model");
         actionTaken = await openMenuAndClickItem(
           modelMenuTriggerSelectors,
-          "Flash 모델",
-          "2.5 Flash", // Ensure this text exactly matches the menu item
+          "Flash Model",
+          "1.5 Flash", // Ensure this text exactly matches the menu item
         );
         break;
 
-      case "o": // Pro 모델 선택 (Select Pro Model)
+      case "o": // Select Pro Model
         event.preventDefault();
-        console.log("Cmd/Ctrl + O 눌림: Pro 모델 선택 시도");
+        console.log("Cmd/Ctrl + O pressed: Attempting to select Pro model");
         actionTaken = await openMenuAndClickItem(
           modelMenuTriggerSelectors,
-          "Pro 모델",
-          "2.5 Pro", // Ensure this text exactly matches the menu item
+          "Pro Model",
+          "1.5 Pro", // Ensure this text exactly matches the menu item
         );
         break;
 
       case "b": // Deep Research
         event.preventDefault();
-        console.log("Cmd/Ctrl + B 눌림: Deep Research 시도");
+        console.log("Cmd/Ctrl + B pressed: Attempting Deep Research");
         const deepResearchButtons = document.querySelectorAll(
           "button.toolbox-drawer-item-button",
         );
@@ -312,23 +323,27 @@ document.addEventListener("keydown", async function (event) {
         if (targetDeepResearchButton) {
           actionTaken = clickElement(
             targetDeepResearchButton,
-            "Deep Research 버튼",
+            "Deep Research Button",
           );
         } else {
           actionTaken = clickElement(
             'button.toolbox-drawer-item-button:has(mat-icon[fonticon="travel_explore"])',
-            "Deep Research 버튼 (icon fallback)",
+            "Deep Research Button (icon fallback)",
           );
           if (!actionTaken) {
-            console.error("Deep Research 버튼을 찾을 수 없습니다.");
-            showTemporaryMessage("Deep Research 버튼을 찾을 수 없습니다.");
+            console.error("Could not find the Deep Research button.");
+            showTemporaryMessage("Could not find the Deep Research button.");
           }
         }
         break;
+      
+      case "/": // Show help message
+        event.preventDefault();
+        console.log("Cmd/Ctrl + / pressed: Showing help");
+        showHelpMessage();
+        actionTaken = true;
+        break;
     }
-    // if (actionTaken) { // Optional: Give feedback only if an action was attempted.
-    //   // Message is shown by individual functions now.
-    // }
   }
 });
 
@@ -346,16 +361,77 @@ function showTemporaryMessage(message, duration = 3000) {
   messageDiv.style.left = "50%";
   messageDiv.style.transform = "translateX(-50%)";
   messageDiv.style.padding = "10px 20px";
-  messageDiv.style.backgroundColor = "rgba(0,0,0,0.85)"; // Slightly more opaque
+  messageDiv.style.backgroundColor = "rgba(0,0,0,0.85)";
   messageDiv.style.color = "white";
   messageDiv.style.borderRadius = "8px";
-  messageDiv.style.zIndex = "10001"; // Ensure it's on top
+  messageDiv.style.zIndex = "10001";
   messageDiv.style.fontSize = "14px";
-  messageDiv.style.boxShadow = "0 4px 12px rgba(0,0,0,0.25)"; // Enhanced shadow
+  messageDiv.style.boxShadow = "0 4px 12px rgba(0,0,0,0.25)";
   messageDiv.style.textAlign = "center";
-  messageDiv.style.fontFamily = "Roboto, Arial, sans-serif"; // Consistent font
+  messageDiv.style.fontFamily = "Roboto, Arial, sans-serif";
   document.body.appendChild(messageDiv);
 
+  setTimeout(() => {
+    if (document.body.contains(messageDiv)) {
+      document.body.removeChild(messageDiv);
+    }
+  }, duration);
+}
+
+// New function to display a formatted help message
+function showHelpMessage(duration = 7000) { // Longer duration for reading
+  const messageId = "gemini-shortcut-help-message";
+  const existingMessage = document.getElementById(messageId);
+
+  // If help is already shown, the keypress will hide it (toggle).
+  if (existingMessage) {
+    existingMessage.remove();
+    return;
+  }
+
+  const messageDiv = document.createElement("div");
+  messageDiv.id = messageId;
+
+  const title = "Gemini Shortcuts";
+  const shortcuts = {
+    "New Chat": "Cmd/Ctrl + J",
+    "Toggle Sidebar": "Cmd/Ctrl + D",
+    "Search": "Cmd/Ctrl + K",
+    "Select Flash Model": "Cmd/Ctrl + I",
+    "Select Pro Model": "Cmd/Ctrl + O",
+    "Deep Research": "Cmd/Ctrl + B",
+    "Show/Hide Help": "Cmd/Ctrl + /"
+  };
+
+  let content = `<div style="margin-bottom: 8px; font-weight: bold; font-size: 15px; border-bottom: 1px solid #555; padding-bottom: 5px;">${title}</div>`;
+  content += '<ul style="margin: 0; padding: 0; list-style: none; text-align: left;">';
+  for (const action in shortcuts) {
+    content += `<li style="margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                    <span>${action}</span>
+                    <code style="background-color: #333; padding: 2px 6px; border-radius: 4px; margin-left: 15px;">${shortcuts[action]}</code>
+                  </li>`;
+  }
+  content += '</ul>';
+
+  messageDiv.innerHTML = content;
+
+  // Style the help panel
+  messageDiv.style.position = "fixed";
+  messageDiv.style.bottom = "20px";
+  messageDiv.style.right = "20px";
+  messageDiv.style.padding = "12px 18px";
+  messageDiv.style.backgroundColor = "rgba(20, 20, 20, 0.95)";
+  messageDiv.style.color = "white";
+  messageDiv.style.borderRadius = "10px";
+  messageDiv.style.zIndex = "10002"; // Higher than other messages
+  messageDiv.style.fontSize = "14px";
+  messageDiv.style.boxShadow = "0 5px 15px rgba(0,0,0,0.3)";
+  messageDiv.style.fontFamily = "Roboto, Arial, sans-serif";
+  messageDiv.style.minWidth = "300px";
+
+  document.body.appendChild(messageDiv);
+
+  // Auto-hide after the specified duration
   setTimeout(() => {
     if (document.body.contains(messageDiv)) {
       document.body.removeChild(messageDiv);
