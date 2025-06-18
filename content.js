@@ -115,7 +115,7 @@ async function openMenuAndClickItem(
 
     for (const item of menuItems) {
       // User's selector for the model name text within the menu item
-      const textElement = item.querySelector("span.gds-label-l.gds-label-m");
+      const textElement = item.querySelector("span.gds-label-m, span.gds-label-l");
       if (
         textElement &&
         textElement.textContent.trim().includes(menuItemTextToFind)
@@ -232,7 +232,10 @@ document.addEventListener("keydown", async function (event) {
         if (document.querySelector(newChatSelector1)) {
           actionTaken = clickElement(newChatSelector1, "New Chat Button");
         } else if (document.querySelector(newChatSelector2)) {
-          actionTaken = clickElement(newChatSelector2, "New Chat Button (fallback)");
+          actionTaken = clickElement(
+            newChatSelector2,
+            "New Chat Button (fallback)",
+          );
         } else {
           actionTaken = clickElement(
             newChatSelector3,
@@ -336,7 +339,7 @@ document.addEventListener("keydown", async function (event) {
           }
         }
         break;
-      
+
       case "/": // Show help message
         event.preventDefault();
         console.log("Cmd/Ctrl + / pressed: Showing help");
@@ -379,7 +382,8 @@ function showTemporaryMessage(message, duration = 3000) {
 }
 
 // New function to display a formatted help message
-function showHelpMessage(duration = 7000) { // Longer duration for reading
+function showHelpMessage(duration = 7000) {
+  // Longer duration for reading
   const messageId = "gemini-shortcut-help-message";
   const existingMessage = document.getElementById(messageId);
 
@@ -396,22 +400,23 @@ function showHelpMessage(duration = 7000) { // Longer duration for reading
   const shortcuts = {
     "New Chat": "Cmd/Ctrl + J",
     "Toggle Sidebar": "Cmd/Ctrl + D",
-    "Search": "Cmd/Ctrl + K",
+    Search: "Cmd/Ctrl + K",
     "Select Flash Model": "Cmd/Ctrl + I",
     "Select Pro Model": "Cmd/Ctrl + O",
     "Deep Research": "Cmd/Ctrl + B",
-    "Show/Hide Help": "Cmd/Ctrl + /"
+    "Show/Hide Help": "Cmd/Ctrl + /",
   };
 
   let content = `<div style="margin-bottom: 8px; font-weight: bold; font-size: 15px; border-bottom: 1px solid #555; padding-bottom: 5px;">${title}</div>`;
-  content += '<ul style="margin: 0; padding: 0; list-style: none; text-align: left;">';
+  content +=
+    '<ul style="margin: 0; padding: 0; list-style: none; text-align: left;">';
   for (const action in shortcuts) {
     content += `<li style="margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
                     <span>${action}</span>
                     <code style="background-color: #333; padding: 2px 6px; border-radius: 4px; margin-left: 15px;">${shortcuts[action]}</code>
                   </li>`;
   }
-  content += '</ul>';
+  content += "</ul>";
 
   messageDiv.innerHTML = content;
 

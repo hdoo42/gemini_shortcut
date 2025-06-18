@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Gemini shortcut",
-  "version": "1.0.1-1",
+  "version": "1.0.2",
   "description": "gemini.google.com 사이트의 주요 기능에 대한 단축키를 추가합니다.",
   "icons": {
     "16": "images/icon16.png",
