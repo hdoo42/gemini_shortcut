@@ -3,7 +3,7 @@
 // Gemini site's UI element selectors can change. If a shortcut stops working,
 // use browser Developer Tools (F12 or Ctrl+Shift+I) to find the new selector.
 
-console.log("Gemini Shortcut Extension Loaded (v1.0.1)");
+console.log("Gemini Shortcut Extension Loaded (v1.0.3)");
 
 // Helper function to click an element (can be selector string or actual element)
 function clickElement(target, description) {
@@ -114,14 +114,11 @@ async function openMenuAndClickItem(
     );
 
     for (const item of menuItems) {
-      // User's selector for the model name text within the menu item
-      const textElement = item.querySelector("span.gds-label-m, span.gds-label-l");
-      if (
-        textElement &&
-        textElement.textContent.trim().includes(menuItemTextToFind)
-      ) {
+      // MODIFIED: Search within the entire text content of the menu item
+      // This is more robust to changes in the internal span structure.
+      if (item.textContent && item.textContent.includes(menuItemTextToFind)) {
         console.log(
-          `Found matching menu item: "${textElement.textContent.trim()}" for "${menuItemTextToFind}".`,
+          `Found matching menu item for "${menuItemTextToFind}". Text: "${item.textContent.trim()}"`,
         );
         // clickElement will check for visibility/interactability
         if (
